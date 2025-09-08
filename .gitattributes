@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+# Explicit (redundant) affirmations for key script/doc types
+*.sh text eol=lf
+*.js text eol=lf
+*.applescript text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
