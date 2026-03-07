@@ -1,4 +1,4 @@
-# Raycast Scripts
+# Raycast Scripts Collection
 
 A curated collection of useful Raycast scripts organized by category for better maintenance and discoverability.
 
