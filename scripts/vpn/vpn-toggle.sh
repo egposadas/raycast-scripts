@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Required parameters:
-# DISABLED: @raycast.schemaVersion 1
-# @raycast.title Connect
+# @raycast.schemaVersion 1
+# @raycast.title DnA VPN - toggle
 # @raycast.mode silent
 
 # Optional parameters:
@@ -10,25 +10,33 @@
 
 # @Documentation:
 # @raycast.packageName VPN
-# @raycast.description Start VPN connection.
-# @raycast.author Alexandru Turcanu
-# @raycast.authorURL https://github.com/Pondorasti
+# @raycast.description Toggle VPN connection on/off.
+# @raycast.author Eduardo Posadas
+# @raycast.authorURL https://github.com/egposadas
 
 
 source vpn-config.sh
 VPN=$VPN_NAME
 
-# Source: https://superuser.com/a/736859
+status=$(scutil --nc status "$VPN" | sed -n 1p)
+
+if [ "$status" == "Connected" ]; then
+    networksetup -disconnectpppoeservice "$VPN"
+    echo "Disconnected from $VPN!"
+    exit 0
+fi
+
+# Connect
 function isnt_connected () {
     scutil --nc status "$VPN" | sed -n 1p | grep -qv Connected
 }
 
 function poll_until_connected () {
     let loops=0 || true
-    let max_loops=200 # 200 * 0.1 is 20 seconds. Bash doesn't support floats
+    let max_loops=200 # 200 * 0.1 is 20 seconds
 
     while isnt_connected "$VPN"; do
-        sleep 0.1 # can't use a variable here, bash doesn't have floats
+        sleep 0.1
         let loops=$loops+1
         [ $loops -gt $max_loops ] && break
     done
@@ -43,5 +51,5 @@ if poll_until_connected "$VPN"; then
 else
     echo "Couldn't connect to $VPN"
     scutil --nc stop "$VPN"
-    exit 1;
+    exit 1
 fi

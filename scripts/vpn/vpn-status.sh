@@ -2,7 +2,7 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Status
+# @raycast.title DnA VPN - status
 # @raycast.mode inline
 # @raycast.refreshTime 1m
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Required parameters:
-# @raycast.schemaVersion 1
+# DISABLED: @raycast.schemaVersion 1
 # @raycast.title Disconnect
 # @raycast.mode silent
 
