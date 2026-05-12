@@ -15,9 +15,10 @@
 # @raycast.authorURL https://github.com/Pondorasti
 
 
-source vpn-config.sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/vpn-config.sh"
 VPN=$VPN_NAME
 
-networksetup -disconnectpppoeservice "$VPN"
+scutil --nc stop "$VPN"
 
 echo "Disconnected from $VPN!"

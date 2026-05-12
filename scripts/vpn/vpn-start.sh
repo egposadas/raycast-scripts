@@ -15,7 +15,8 @@
 # @raycast.authorURL https://github.com/Pondorasti
 
 
-source vpn-config.sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/vpn-config.sh"
 VPN=$VPN_NAME
 
 # Source: https://superuser.com/a/736859
@@ -36,7 +37,7 @@ function poll_until_connected () {
     [ $loops -le $max_loops ]
 }
 
-networksetup -connectpppoeservice "$VPN"
+scutil --nc start "$VPN"
 
 if poll_until_connected "$VPN"; then
     echo "Connected to $VPN!"

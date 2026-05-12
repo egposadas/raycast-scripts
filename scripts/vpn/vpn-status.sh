@@ -11,12 +11,13 @@
 
 # @Documentation:
 # @raycast.packageName VPN
-# @raycast.description Stop VPN connection.
+# @raycast.description Check VPN connection status.
 # @raycast.author Alexandru Turcanu
 # @raycast.authorURL https://github.com/Pondorasti
 
 
-source vpn-config.sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/vpn-config.sh"
 VPN=$VPN_NAME
 
 status=$(scutil --nc status "$VPN" | sed -n 1p)
