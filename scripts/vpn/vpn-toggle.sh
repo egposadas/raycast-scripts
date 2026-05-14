@@ -2,11 +2,11 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title DnA VPN - toggle
+# @raycast.title Proton VPN - toggle
 # @raycast.mode silent
 
 # Optional parameters:
-# @raycast.icon 📡
+# @raycast.icon 🌐
 
 # @Documentation:
 # @raycast.packageName VPN
@@ -23,7 +23,7 @@ status=$(scutil --nc status "$VPN" | sed -n 1p)
 
 if [ "$status" == "Connected" ]; then
     scutil --nc stop "$VPN"
-    echo "Disconnected from $VPN!"
+    echo "❌ Disconnected from $VPN!"
     exit 0
 fi
 
@@ -48,9 +48,9 @@ function poll_until_connected () {
 scutil --nc start "$VPN"
 
 if poll_until_connected "$VPN"; then
-    echo "Connected to $VPN!"
+    echo "✅ Connected to $VPN!"
 else
-    echo "Couldn't connect to $VPN"
+    echo "⚠️ Couldn't connect to $VPN"
     scutil --nc stop "$VPN"
     exit 1
 fi

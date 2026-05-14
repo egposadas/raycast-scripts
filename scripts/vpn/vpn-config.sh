@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Name of your VPN Config from System Preferences
-export VPN_NAME="rty-dna-bip-peered-vpn"
+export VPN_NAME="ProtonVPN"
 
 if [ -z "$VPN_NAME" ]; then
   echo "\$VPN_NAME is empty";
