@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Required parameters:
-# @raycast.schemaVersion 1
-# @raycast.title Proton VPN - status
+# DEACTIVATED — uncomment to re-enable in Raycast
+# # @raycast.schemaVersion 1
+# # @raycast.title Proton VPN - status
 # @raycast.mode inline
 # @raycast.refreshTime 1m
 
@@ -20,11 +21,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/vpn-config.sh"
 VPN=$VPN_NAME
 
-status=$(scutil --nc status "$VPN" | sed -n 1p)
-
-if [ "$status" == "Connected" ]; then
-  echo "✅ $status to $VPN"
+if vpn_is_connected; then
+  echo "✅ Connected to $VPN"
   exit 0
 fi
 
-echo "$status"
+echo "Disconnected"

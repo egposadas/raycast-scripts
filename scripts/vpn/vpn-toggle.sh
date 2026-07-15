@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Required parameters:
-# @raycast.schemaVersion 1
-# @raycast.title Proton VPN - toggle
+# DEACTIVATED — uncomment to re-enable in Raycast
+# # @raycast.schemaVersion 1
+# # @raycast.title Proton VPN - toggle
 # @raycast.mode silent
 
 # Optional parameters:
@@ -19,38 +20,34 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/vpn-config.sh"
 VPN=$VPN_NAME
 
-status=$(scutil --nc status "$VPN" | sed -n 1p)
-
-if [ "$status" == "Connected" ]; then
-    scutil --nc stop "$VPN"
+if vpn_is_connected; then
+    vpn_toggle_via_settings "$VPN" "disconnect"
+    sleep 2
+    if vpn_is_connected; then
+        echo "⚠️ Couldn't disconnect from $VPN"
+        exit 1
+    fi
     echo "❌ Disconnected from $VPN!"
     exit 0
 fi
 
 # Connect
-function isnt_connected () {
-    scutil --nc status "$VPN" | sed -n 1p | grep -qv Connected
-}
+vpn_toggle_via_settings "$VPN" "connect"
 
-function poll_until_connected () {
-    let loops=0 || true
-    let max_loops=200 # 200 * 0.1 is 20 seconds
+# Poll until connected (up to 20 seconds)
+loops=0
+max_loops=200
 
-    while isnt_connected "$VPN"; do
-        sleep 0.1
-        let loops=$loops+1
-        [ $loops -gt $max_loops ] && break
-    done
+while ! vpn_is_connected; do
+    sleep 0.1
+    loops=$((loops + 1))
+    [ $loops -gt $max_loops ] && break
+done
 
-    [ $loops -le $max_loops ]
-}
-
-scutil --nc start "$VPN"
-
-if poll_until_connected "$VPN"; then
+if [ $loops -le $max_loops ]; then
     echo "✅ Connected to $VPN!"
 else
     echo "⚠️ Couldn't connect to $VPN"
-    scutil --nc stop "$VPN"
+    vpn_toggle_via_settings "$VPN" "disconnect"
     exit 1
 fi
