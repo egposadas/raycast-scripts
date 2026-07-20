@@ -6,14 +6,15 @@
 # @raycast.mode silent
 
 # Optional parameters:
-# @raycast.icon 👥
+# @raycast.icon ../images/calendar.png
+# @raycast.packageName Calendar
 # @raycast.argument1 { "type": "text", "placeholder": "Meeting title (fuzzy)" }
 # @raycast.argument2 { "type": "text", "placeholder": "Date (e.g. today+3, 2026-05-14)", "optional": true }
 
 # Documentation:
 # @raycast.description Find meeting details by fuzzy title match, copy to clipboard for Reflect
 # @raycast.author egposadas
-# @raycast.authorURL https://raycast.com/batcave/scripts
+# @raycast.authorURL https://github.com/egposadas
 
 # Load shared helpers
 source "$(dirname "$0")/_calendar_helpers.sh"
@@ -21,6 +22,11 @@ check_icalbuddy
 
 search_term="$1"
 date_arg="$2"
+
+if [[ -z "$search_term" ]]; then
+  echo "Enter a meeting title to search for"
+  exit 1
+fi
 
 # Query events with title, datetime, and notes
 # Use § separator to avoid conflicts with ": " in titles/notes
@@ -81,18 +87,25 @@ num_matches=${#match_titles_arr[@]}
 if [[ $num_matches -eq 1 ]]; then
   matched_title="${match_titles_arr[0]}"
   matched_notes=$(restore_newlines "${match_notes_arr[0]}")
+  join_url=$(extract_join_url "$matched_notes" || true)
+
   result="- **${match_times_arr[0]}: ${matched_title}**"
+  [[ -n "$join_url" ]] && result+=$'\n'"  _Join:_ ${join_url}"
   [[ -n "$matched_notes" ]] && result+=$'\n'"  _Notes:_ ${matched_notes}"
 
   safe_copy "$result"
-  echo "\"$matched_title\" copied to clipboard"
+  if [[ -n "$join_url" ]]; then
+    echo "\"$matched_title\" copied (with join link)"
+  else
+    echo "\"$matched_title\" copied to clipboard"
+  fi
 elif [[ $num_matches -gt 1 ]]; then
-  echo "Multiple matches for \"$1\" — refine your search:"
+  echo "Multiple matches for \"$search_term\" — refine your search:"
   for ((i=0; i<num_matches; i++)); do
     echo "  ${match_times_arr[$i]}: ${match_titles_arr[$i]}"
   done
 else
-  echo "No meeting found matching \"$1\""
+  echo "No meeting found matching \"$search_term\""
   if [[ ${#all_entries[@]} -gt 0 ]]; then
     echo "Available meetings:"
     for entry in "${all_entries[@]}"; do

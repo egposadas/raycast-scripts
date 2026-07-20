@@ -2,14 +2,18 @@
 
 // Required parameters:
 // @raycast.schemaVersion 1
-// @raycast.title Toggle sidecar
+// @raycast.title Toggle Sidecar
 // @raycast.mode inline
 
 // Optional parameters:
 // @raycast.icon 🖥️
+// @raycast.packageName System
+// @raycast.argument1 { "type": "text", "placeholder": "Device name (default: C3P0)", "optional": true }
 
 // Documentation:
-// @raycast.description Toggle sidecar
+// @raycast.description Toggle Sidecar / screen mirroring for a target device
+// @raycast.author egposadas
+// @raycast.authorURL https://github.com/egposadas
 
 /**
  * -----------------------------------------------------------------------------
@@ -31,8 +35,9 @@
  *   updates.
  */
 
-function run(_) {
-    const TARGET_DEVICE_NAME = 'C3P0' // Change this to your target device name
+function run(argv) {
+    // Prefer Raycast argument; fall back to a personal default.
+    const TARGET_DEVICE_NAME = (argv && argv[0] && String(argv[0]).trim()) || 'C3P0'
     const $attr = Ref()
     const $windows = Ref()
     const $children = Ref()

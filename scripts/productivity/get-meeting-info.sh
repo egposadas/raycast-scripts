@@ -6,14 +6,15 @@
 # @raycast.mode fullOutput
 
 # Optional parameters:
-# @raycast.icon ℹ️
+# @raycast.icon ../images/calendar.png
+# @raycast.packageName Calendar
 # @raycast.argument1 { "type": "text", "placeholder": "Meeting Title (fuzzy)" }
 # @raycast.argument2 { "type": "text", "placeholder": "Date (e.g. today+3, 2026-05-14)", "optional": true }
 
 # Documentation:
 # @raycast.description Show meeting info (attendees, notes, location) and copy to clipboard for Reflect
 # @raycast.author egposadas
-# @raycast.authorURL https://raycast.com/batcave/scripts
+# @raycast.authorURL https://github.com/egposadas
 
 # Load shared helpers
 source "$(dirname "$0")/_calendar_helpers.sh"
@@ -21,6 +22,11 @@ check_icalbuddy
 
 search_term="$1"
 date_arg="$2"
+
+if [[ -z "$search_term" ]]; then
+  echo "Enter a meeting title to search for"
+  exit 1
+fi
 
 # Query events with all useful properties
 # Use a unique separator (§) between properties to avoid conflicts with ": " in content
@@ -88,17 +94,20 @@ if [[ $num_matches -eq 1 ]]; then
   matched_title="${match_titles[0]}"
   matched_attendees="${match_attendees[0]}"
   matched_notes=$(restore_newlines "${match_notes[0]}")
+  join_url=$(extract_join_url "$matched_notes" || true)
 
   # Build display output (shown in Raycast fullOutput panel)
   display="## ${matched_title}"
   display+=$'\n'
   [[ -n "$matched_time" ]] && display+=$'\n'"**Time:** ${matched_time}"
+  [[ -n "$join_url" ]] && display+=$'\n'"**Join:** ${join_url}"
   [[ -n "$matched_attendees" ]] && display+=$'\n\n'"**Attendees:** ${matched_attendees}"
   [[ -n "$matched_notes" ]] && display+=$'\n\n'"**Notes from invite:**"$'\n'"${matched_notes}"
 
   # Build clipboard output (optimized for Reflect notes pasting)
   clipboard=""
   [[ -n "$matched_time" ]] && clipboard+="- _Time:_ ${matched_time}"$'\n'
+  [[ -n "$join_url" ]] && clipboard+="- _Join:_ ${join_url}"$'\n'
   [[ -n "$matched_attendees" ]] && clipboard+="- _Attendees:_ ${matched_attendees}"$'\n'
   if [[ -n "$matched_notes" ]]; then
     clipboard+="- _Notes:_"$'\n'"${matched_notes}"$'\n'
@@ -114,17 +123,21 @@ if [[ $num_matches -eq 1 ]]; then
   printf '%s\n' "$display"
   echo ""
   echo "---"
-  echo "Copied to clipboard for ${date_arg:-today}"
+  if [[ -n "$join_url" ]]; then
+    echo "Copied to clipboard for ${date_arg:-today} (join link included)"
+  else
+    echo "Copied to clipboard for ${date_arg:-today}"
+  fi
 elif [[ $num_matches -gt 1 ]]; then
   # Multiple matches — list them so the user can refine
-  echo "Multiple matches found for \"$1\" — please refine your search:"
+  echo "Multiple matches found for \"$search_term\" — please refine your search:"
   echo ""
   for ((i=0; i<num_matches; i++)); do
     echo "  ${match_times[$i]}: ${match_titles[$i]}"
   done
   exit 1
 else
-  echo "No matching event found for \"$1\" on ${date_arg:-today}"
+  echo "No matching event found for \"$search_term\" on ${date_arg:-today}"
   if [[ ${#all_entries[@]} -gt 0 ]]; then
     echo ""
     echo "Available meetings:"

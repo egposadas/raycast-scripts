@@ -1,38 +1,17 @@
 # VPN Scripts
 
-Scripts for managing VPN connections on macOS.
+Azure VPN Client scripts for the `rty-dna` connection, controlled via `scutil --nc`.
 
 ## Scripts
 
-### vpn-config.sh
-Manages VPN configuration settings.
-- **Mode**: Variable
-- **Dependencies**: None
-- **Permissions**: Network settings access may be required
+| File | Raycast title | Mode |
+|------|---------------|------|
+| `vpn-config.sh` | (shared helpers) | — |
+| `vpn-status.sh` | Azure VPN - status | Inline (1m refresh) |
+| `vpn-toggle.sh` | Azure VPN - toggle | Silent |
 
-### vpn-start.sh
-Starts a VPN connection.
-- **Mode**: Silent
-- **Dependencies**: None  
-- **Permissions**: Network settings access required
+## Setup
 
-### vpn-status.sh
-Checks the current status of VPN connection.
-- **Mode**: Inline
-- **Dependencies**: None
-- **Permissions**: Network settings access may be required
-
-### vpn-stop.sh
-Stops the active VPN connection.
-- **Mode**: Silent
-- **Dependencies**: None
-- **Permissions**: Network settings access required
-
-## Setup Notes
-
-These scripts may require:
-1. VPN client software to be installed
-2. Network settings permissions
-3. Specific VPN configuration profiles
-
-Make sure your VPN is properly configured before using these scripts.
+1. Install **Azure VPN Client** and import the `rty-dna` profile
+2. Confirm the name: `scutil --nc list`
+3. If the name differs, edit `VPN_NAME` in `vpn-config.sh`

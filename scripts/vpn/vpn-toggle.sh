@@ -1,18 +1,17 @@
 #!/bin/bash
 
 # Required parameters:
-# DEACTIVATED — uncomment to re-enable in Raycast
-# # @raycast.schemaVersion 1
-# # @raycast.title Proton VPN - toggle
+# @raycast.schemaVersion 1
+# @raycast.title Azure VPN - toggle
 # @raycast.mode silent
 
 # Optional parameters:
-# @raycast.icon 🌐
-
-# @Documentation:
+# @raycast.icon ../images/azure-vpn.png
 # @raycast.packageName VPN
-# @raycast.description Toggle VPN connection on/off.
-# @raycast.author Eduardo Posadas
+
+# Documentation:
+# @raycast.description Toggle Azure VPN (rty-dna) connection on/off
+# @raycast.author egposadas
 # @raycast.authorURL https://github.com/egposadas
 
 
@@ -20,10 +19,15 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/vpn-config.sh"
 VPN=$VPN_NAME
 
-if vpn_is_connected; then
-    vpn_toggle_via_settings "$VPN" "disconnect"
-    sleep 2
-    if vpn_is_connected; then
+vpn_require
+
+status=$(vpn_status)
+
+if [ "$status" == "Connected" ]; then
+    scutil --nc stop "$VPN"
+    # Brief wait so status reflects disconnect
+    sleep 0.5
+    if [ "$(vpn_status)" == "Connected" ]; then
         echo "⚠️ Couldn't disconnect from $VPN"
         exit 1
     fi
@@ -31,23 +35,29 @@ if vpn_is_connected; then
     exit 0
 fi
 
-# Connect
-vpn_toggle_via_settings "$VPN" "connect"
+function isnt_connected () {
+    vpn_status | grep -qv Connected
+}
 
-# Poll until connected (up to 20 seconds)
-loops=0
-max_loops=200
+function poll_until_connected () {
+    local loops=0
+    local max_loops=200 # 200 * 0.1 is 20 seconds
 
-while ! vpn_is_connected; do
-    sleep 0.1
-    loops=$((loops + 1))
-    [ $loops -gt $max_loops ] && break
-done
+    while isnt_connected; do
+        sleep 0.1
+        loops=$((loops + 1))
+        [ $loops -gt $max_loops ] && break
+    done
 
-if [ $loops -le $max_loops ]; then
+    [ $loops -le $max_loops ]
+}
+
+scutil --nc start "$VPN"
+
+if poll_until_connected; then
     echo "✅ Connected to $VPN!"
 else
     echo "⚠️ Couldn't connect to $VPN"
-    vpn_toggle_via_settings "$VPN" "disconnect"
+    scutil --nc stop "$VPN"
     exit 1
 fi

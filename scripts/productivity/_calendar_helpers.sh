@@ -118,3 +118,58 @@ restore_newlines() {
   local newline=$'\n'
   printf '%s' "${text//${NL_MARKER}/${newline}}"
 }
+
+# --- Extract first meeting join URL from notes ---
+# Prefers Teams, then Zoom, then Google Meet, then any https URL.
+extract_join_url() {
+  local notes="$1"
+  [[ -z "$notes" ]] && return 1
+
+  local url
+  url=$(printf '%s' "$notes" | grep -Eo 'https://teams\.microsoft\.com/l/meetup-join/[^[:space:]>"]+' | head -1)
+  [[ -n "$url" ]] && { printf '%s' "$url"; return 0; }
+
+  url=$(printf '%s' "$notes" | grep -Eo 'https://[^[:space:]"]*zoom\.us/j/[^[:space:]>"]+' | head -1)
+  [[ -n "$url" ]] && { printf '%s' "$url"; return 0; }
+
+  url=$(printf '%s' "$notes" | grep -Eo 'https://meet\.google\.com/[a-zA-Z0-9-]+' | head -1)
+  [[ -n "$url" ]] && { printf '%s' "$url"; return 0; }
+
+  url=$(printf '%s' "$notes" | grep -Eo 'https://[^[:space:]>"]+' | head -1)
+  [[ -n "$url" ]] && { printf '%s' "$url"; return 0; }
+
+  return 1
+}
+
+# --- Schedule day label ---
+# Usage: schedule_day_label "$date_arg"
+# Returns a human label like "Monday, 20 Jul 2026".
+schedule_day_label() {
+  local date_arg="$1"
+  if [[ -z "$date_arg" || "$date_arg" == "today" ]]; then
+    date "+%A, %d %b %Y"
+  else
+    # Best-effort parse; fall back to the raw argument on failure.
+    date -j -f "%Y-%m-%d" "$date_arg" "+%A, %d %b %Y" 2>/dev/null \
+      || date -j -v"$date_arg" "+%A, %d %b %Y" 2>/dev/null \
+      || printf '%s' "$date_arg"
+  fi
+}
+
+# --- Is current time inside HH:MM - HH:MM? ---
+# Usage: is_happening_now "09:00 - 09:30"
+is_happening_now() {
+  local range="$1"
+  local start_h start_m end_h end_m now_mins start_mins end_mins
+  if [[ ! "$range" =~ ^([0-9]{2}):([0-9]{2})\ -\ ([0-9]{2}):([0-9]{2}) ]]; then
+    return 1
+  fi
+  start_h="${BASH_REMATCH[1]}"
+  start_m="${BASH_REMATCH[2]}"
+  end_h="${BASH_REMATCH[3]}"
+  end_m="${BASH_REMATCH[4]}"
+  now_mins=$((10#$(date +%H) * 60 + 10#$(date +%M)))
+  start_mins=$((10#$start_h * 60 + 10#$start_m))
+  end_mins=$((10#$end_h * 60 + 10#$end_m))
+  [[ $now_mins -ge $start_mins && $now_mins -lt $end_mins ]]
+}

@@ -2,18 +2,19 @@
 
 # Required parameters:
 # @raycast.schemaVersion 1
-# @raycast.title Get my schedule
+# @raycast.title Get My Schedule
 # @raycast.mode silent
 
 # Optional parameters:
-# @raycast.icon 📅
+# @raycast.icon ../images/calendar.png
+# @raycast.packageName Calendar
 # @raycast.needsConfirmation false
 # @raycast.argument1 { "type": "text", "placeholder": "Date (e.g. today+3, 2026-05-14)", "optional": true }
 
 # Documentation:
-# @raycast.description icalBuddy schedule of the day with formatted output for Reflect timebox
+# @raycast.description Copy today's schedule (or a given date) formatted for Reflect timebox
 # @raycast.author egposadas
-# @raycast.authorURL https://raycast.com/batcave/scripts
+# @raycast.authorURL https://github.com/egposadas
 
 # Load shared helpers
 source "$(dirname "$0")/_calendar_helpers.sh"
@@ -55,13 +56,19 @@ while IFS= read -r line; do
     local_title=$(printf '%s' "$after_time" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     is_excluded "$local_title" && continue
 
-    entry="- **${time_part}: ${local_title}**"
+    if [[ -z "$date_arg" || "$date_arg" == "today" ]] && is_happening_now "$time_part"; then
+      entry="- ▶️ **${time_part}: ${local_title}**"
+    else
+      entry="- **${time_part}: ${local_title}**"
+    fi
 
     timed_schedule+="${entry}"$'\n'
     ((event_count++))
   else
     # --- All-day event ---
     local_title=$(printf '%s' "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    # Strip leading date labels that can remain on all-day lines
+    local_title=$(printf '%s' "$local_title" | sed -E 's/^[^:]+: //')
     is_excluded "$local_title" && continue
 
     entry="- ☀️ **All Day: ${local_title}**"
@@ -71,8 +78,11 @@ while IFS= read -r line; do
   fi
 done <<< "$raw_schedule"
 
-# Combine: all-day first, then timed
-formatted_schedule="${allday_schedule}${timed_schedule}"
+day_label=$(schedule_day_label "$date_arg")
+header="# Schedule — ${day_label}"$'\n'
+
+# Combine: header, all-day first, then timed
+formatted_schedule="${header}${allday_schedule}${timed_schedule}"
 
 # Check if the schedule is empty after filtering
 if [[ -z "$formatted_schedule" ]]; then

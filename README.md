@@ -1,132 +1,91 @@
 # Raycast Scripts Collection
 
-A curated collection of useful Raycast scripts organized by category for better maintenance and discoverability.
+Personal Raycast Script Commands, organized by category.
 
-## 🚀 Quick Start
+## Quick Start
 
-1. Clone or download this repository
-2. Import scripts into Raycast:
-   - Open Raycast
-   - Go to Extensions
-   - Click "+" to add script
-   - Navigate to the script file you want to add
-   - Click "Add Script"
+1. Clone this repository
+2. Open Raycast → **Extensions** → **Script Commands** → add a script directory
+3. Point it at this repo's `scripts/` folder (or a subcategory)
+4. Search Raycast for the command titles below
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 scripts/
-├── calendar/          # Calendar and meeting management scripts
-├── productivity/      # Productivity and utility scripts
-├── system/           # System utilities and configuration scripts
-├── vpn/              # VPN management scripts
-├── work/             # Work or company-specific scripts
-└── templates/        # Script templates for creating new scripts
+├── images/           # PNG icons for Script Commands (64px)
+├── productivity/     # Calendar, Mail, daily workflow
+├── system/           # macOS system utilities
+├── vpn/              # Azure VPN (rty-dna) connect/status
+├── work/             # Riverty-specific utilities
+└── templates/        # Starters for new scripts
 ```
 
-## 📋 Available Scripts
+## Available Scripts
 
-### 📅 Calendar
-- **get-meeting-info.sh** - Get information about calendar events by title
-- **get-meeting.sh** - Retrieve meeting details
-- **get-my-schedule.sh** - Display your schedule
+### Calendar (`scripts/productivity/`)
 
-### 🎯 Productivity
-- **clipboard-to-markdown.js** - Convert clipboard content to Markdown format
-- **mail-deeplink.applescript** - Create deep links for mail items
+| Command | File | Mode |
+|---------|------|------|
+| **Get Meeting** | `get-meeting.sh` | silent |
+| **Get Meeting Info** | `get-meeting-info.sh` | fullOutput |
+| **Get My Schedule** | `get-my-schedule.sh` | silent |
 
-### 🔧 System
-- **dock-autohide.sh** - Toggle dock auto-hide setting
-- **toggle-sidecar.js** - Toggle macOS Sidecar functionality
-- **generate-git-ignore.sh** - Generate .gitignore files
-- **get_env_value.sh** - Retrieve environment variable values
-- **github-copilot-rules.sh** - GitHub Copilot configuration utilities
+Requires [icalBuddy](https://github.com/Ali-Sadel/icalBuddy).
 
-### 🔐 VPN
-- **vpn-config.sh** - VPN configuration management
-- **vpn-start.sh** - Start VPN connection
-- **vpn-status.sh** - Check VPN connection status
-- **vpn-stop.sh** - Stop VPN connection
+Extras:
+- Extracts Teams / Zoom / Meet join links from invite notes when present
+- Schedule output includes a day header and marks the current meeting with ▶️
 
-### 🏢 Work
-- **riverty-colors.sh** - Company-specific color utilities
+### Productivity
 
-## 🛠️ Creating New Scripts
+| Command | File | Mode |
+|---------|------|------|
+| **Copy Mail Deeplink** | `mail-deeplink.applescript` | silent |
 
-Use the templates in `scripts/templates/` to create new scripts:
+Select message(s) in Apple Mail, then run the command to copy Markdown `message://` deeplinks.
 
-1. Copy the appropriate template file:
-   - `template.sh` for shell scripts
-   - `template.js` for Node.js scripts
-   - `template.applescript` for AppleScript scripts
+### System
 
-2. Replace placeholder values:
-   - `[Script Title]` - Your script's title
-   - `[Brief description]` - What your script does
-   - `[Your Name]` - Your name
-   - `[Your URL]` - Your website/profile URL
+| Command | File | Mode |
+|---------|------|------|
+| **Toggle Sidecar** | `toggle-sidecar.js` | inline |
 
-3. Implement your script logic
+Optional device-name argument (defaults to `C3P0`).
 
-4. Make the script executable: `chmod +x your-script.sh`
+### VPN (`scripts/vpn/`)
 
-## 📋 Raycast Script Parameters
+| Command | File | Mode |
+|---------|------|------|
+| **Azure VPN - status** | `vpn-status.sh` | inline |
+| **Azure VPN - toggle** | `vpn-toggle.sh` | silent |
 
-Each script includes metadata headers that Raycast uses:
+Connection name is set in `vpn-config.sh` (`VPN_NAME=rty-dna`). Confirm with `scutil --nc list`.
 
-- `@raycast.schemaVersion` - Always set to 1
-- `@raycast.title` - Script name shown in Raycast
-- `@raycast.mode` - Output mode (silent, inline, compact, fullOutput)
-- `@raycast.icon` - Icon displayed in Raycast (emoji or SF Symbol)
-- `@raycast.description` - Brief description of functionality
-- `@raycast.author` - Script author
-- `@raycast.authorURL` - Author's website or profile
+### Work
 
-## 🔧 Dependencies
+| Command | File | Mode |
+|---------|------|------|
+| **Riverty Colors** | `riverty-colors.sh` | silent |
 
-Some scripts may require additional dependencies:
+Copies Hex, RGB, or RGBA for brand colors at 100% / 70% / 30% opacity.
 
-- **Node.js scripts** - Require Node.js installation
-- **Python scripts** - Require Python installation
-- **Shell scripts** - Work with standard macOS shell
+## Icons
 
-Install dependencies as needed for the scripts you want to use.
+Raycast Script Commands only support **emoji**, **PNG**, or **JPEG** icons (not `.icns`). App icons live in `scripts/images/` and are referenced with relative paths like `../images/calendar.png`.
 
-## 📖 Usage Tips
+## Creating New Scripts
 
-1. **Script Organization**: Scripts are organized by functionality to make them easier to find
-2. **Naming Convention**: Use descriptive names that clearly indicate the script's purpose
-3. **Documentation**: Each script includes inline documentation and usage examples
-4. **Permissions**: Some scripts may require system permissions (accessibility, calendar access, etc.)
+1. Copy a template from `scripts/templates/`
+2. Fill in `@raycast.title`, `@raycast.mode`, `@raycast.icon`, and `@raycast.description`
+3. Prefer a PNG under `scripts/images/` for app-tied commands; use emoji for abstract utilities
+4. Set `@raycast.packageName` so related commands group in Raycast
+5. Make the script executable: `chmod +x your-script.sh`
 
-## 🤝 Contributing
+## Troubleshooting
 
-1. Create new scripts using the provided templates
-2. Place scripts in the appropriate category folder
-3. Follow the existing naming conventions
-4. Include proper Raycast metadata headers
-5. Test scripts thoroughly before adding
-
-## 📄 License
-
-This collection is for personal use. Individual scripts may have their own licenses - check script headers for details.
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-1. **Permission Denied**: Make sure scripts are executable (`chmod +x script-name.sh`)
-2. **Script Not Found**: Verify the script path and file permissions
-3. **Missing Dependencies**: Install required dependencies (Node.js, Python, etc.)
-4. **System Permissions**: Grant necessary permissions in System Preferences
-
-### Getting Help
-
-- Check script headers for specific requirements
-- Ensure all dependencies are installed
-- Verify system permissions are granted
-- Test scripts from command line first
-
----
-
-Happy scripting! 🎉
+- **Permission denied** — `chmod +x` the script
+- **Script missing in Raycast** — ensure `@raycast.schemaVersion` and `@raycast.title` are present (not commented out)
+- **No icon** — use emoji or a PNG/JPEG path (`.icns` will not render)
+- **Calendar scripts fail** — install `icalBuddy` and grant Calendar access
+- **VPN scripts fail** — confirm Azure VPN Client is installed and `VPN_NAME` matches `scutil --nc list`
