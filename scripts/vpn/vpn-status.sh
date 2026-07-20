@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Required parameters:
-# @raycast.schemaVersion 1
-# @raycast.title Azure VPN - status
+# DEACTIVATED — moved to a Raycast extension; uncomment to re-enable as a Script Command
+# # @raycast.schemaVersion 1
+# # @raycast.title Azure VPN - status
 # @raycast.mode inline
 # @raycast.refreshTime 1m
 

@@ -2,13 +2,15 @@
 
 Azure VPN Client scripts for the `rty-dna` connection, controlled via `scutil --nc`.
 
+> **Disabled in Raycast** — these Script Commands are deactivated because VPN is now handled by a Raycast extension. The scripts remain for CLI use / backup. To re-enable, uncomment `@raycast.schemaVersion` and `@raycast.title` in `vpn-status.sh` and `vpn-toggle.sh`.
+
 ## Scripts
 
 | File | Raycast title | Mode |
 |------|---------------|------|
 | `vpn-config.sh` | (shared helpers) | — |
-| `vpn-status.sh` | Azure VPN - status | Inline (1m refresh) |
-| `vpn-toggle.sh` | Azure VPN - toggle | Silent |
+| `vpn-status.sh` | Azure VPN - status (disabled) | Inline (1m refresh) |
+| `vpn-toggle.sh` | Azure VPN - toggle (disabled) | Silent |
 
 ## Setup
 

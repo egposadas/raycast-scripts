@@ -53,14 +53,9 @@ Select message(s) in Apple Mail, then run the command to copy Markdown `message:
 
 Optional device-name argument (defaults to `C3P0`).
 
-### VPN (`scripts/vpn/`)
+### VPN (`scripts/vpn/`) — disabled as Script Commands
 
-| Command | File | Mode |
-|---------|------|------|
-| **Azure VPN - status** | `vpn-status.sh` | inline |
-| **Azure VPN - toggle** | `vpn-toggle.sh` | silent |
-
-Connection name is set in `vpn-config.sh` (`VPN_NAME=rty-dna`). Confirm with `scutil --nc list`.
+Kept in the repo for backup/CLI use; Raycast metadata is commented out because VPN is handled by an extension. Connection name: `VPN_NAME=rty-dna` in `vpn-config.sh`.
 
 ### Work
 
